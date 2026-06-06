@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>rimborso sorella</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F7F4EF;
+    --surface: #FFFFFF;
+    --border: #E2DDD6;
+    --border-strong: #C8C2B8;
+    --text: #1C1A17;
+    --text-muted: #7A7670;
+    --text-faint: #B0ABA4;
+    --green: #2D6A4F;
+    --green-bg: #EAF4EF;
+    --red: #8B2E2E;
+    --red-bg: #F9ECEC;
+    --accent: #3D5A80;
+    --accent-bg: #EBF0F7;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .page {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  header {
+    margin-bottom: 2rem;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-weight: 300;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  h1 span {
+    color: var(--text-faint);
+    font-size: 13px;
+    font-weight: 400;
+    display: block;
+    margin-top: 4px;
+    font-family: var(--sans);
+    letter-spacing: 0;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    background: var(--surface);
+  }
+
+  .tab {
+    flex: 1;
+    padding: 10px 8px;
+    font-size: 13px;
+    font-family: var(--sans);
+    font-weight: 400;
+    color: var(--text-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-right: 1px solid var(--border);
+  }
+
+  .tab:last-child { border-right: none; }
+
+  .tab.active {
+    background: var(--text);
+    color: #fff;
+    font-weight: 500;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: flex; flex-direction: column; gap: 1rem; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .card-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 0.75rem;
+  }
+
+  .big-num {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .big-num.green { color: var(--green); }
+  .big-num.red { color: var(--red); }
+
+  .progress-wrap {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 10px 0 6px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-note {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+  }
+
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .metric {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 0.75rem;
+  }
+
+  .metric-label {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+
+  .metric-val {
+    font-family: var(--mono);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .metric-val.green { color: var(--green); }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .field-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  input, select {
+    flex: 1;
+    min-width: 0;
+    padding: 9px 12px;
+    font-size: 14px;
+    font-family: var(--sans);
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--border-strong);
+    background: var(--surface);
+  }
+
+  input::placeholder { color: var(--text-faint); }
+
+  button.primary {
+    padding: 9px 18px;
+    font-size: 14px;
+    font-family: var(--sans);
+    font-weight: 500;
+    color: #fff;
+    background: var(--text);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+
+  button.primary:hover { opacity: 0.85; }
+  button.primary:active { opacity: 0.7; }
+
+  .log-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .log-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+
+  .log-item:last-child { border-bottom: none; }
+
+  .log-date {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  .log-desc { color: var(--text); }
+
+  .log-tag {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .tag-risparmio { background: var(--accent-bg); color: var(--accent); }
+  .tag-spesa { background: var(--green-bg); color: var(--green); }
+  .tag-restituito { background: var(--green-bg); color: var(--green); }
+  .tag-mamma { background: #FEF3E2; color: #7A4F10; }
+  .tag-init { background: var(--bg); color: var(--text-muted); }
+
+  .log-amount {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .log-amount.pos { color: var(--green); }
+  .log-amount.neg { color: var(--red); }
+  .log-amount.neu { color: var(--text-muted); }
+
+  .del-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-faint);
+    font-size: 16px;
+    padding: 2px 4px;
+    line-height: 1;
+    border-radius: 4px;
+    transition: color 0.15s;
+  }
+
+  .del-btn:hover { color: var(--red); }
+
+  .empty {
+    text-align: center;
+    color: var(--text-faint);
+    font-size: 13px;
+    padding: 2rem 0;
+  }
+
+  .section-divider {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    margin-bottom: 6px;
+  }
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-muted);
+    padding: 4px 0;
+  }
+
+  .info-row strong {
+    font-family: var(--mono);
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  @media (max-width: 400px) {
+    .big-num { font-size: 28px; }
+    .tab { font-size: 12px; padding: 9px 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+    <h1>rimborso sorella <span>tracker personale</span></h1>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('debito')">debito</button>
+    <button class="tab" onclick="showTab('mamma')">fondo mamma</button>
+    <button class="tab" onclick="showTab('storico')">storico</button>
+  </div>
+
+  <!-- DEBITO -->
+  <div class="panel active" id="panel-debito">
+    <div class="card">
+      <div class="card-label">debito residuo</div>
+      <div class="big-num" id="debito-display">€0,00</div>
+      <div class="progress-wrap"><div class="progress-fill" id="debito-progress" style="width:0%"></div></div>
+      <div class="progress-note" id="debito-note"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">imposta importo iniziale</div>
+      <div class="field-row">
+        <input type="number" id="debito-init" placeholder="es. 1500" min="0" step="0.01">
+        <button class="primary" onclick="setDebito()">imposta</button>
+      </div>
+      <div style="font-size:12px;color:var(--text-faint);margin-top:8px">attenzione: reimpostare azzera il contatore</div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">aggiungi movimento</div>
+      <div class="field-group">
+        <select id="tipo-mov">
+          <option value="risparmio">metto via (risparmio)</option>
+          <option value="spesa">spesa per lei</option>
+          <option value="restituito">restituito direttamente</option>
+        </select>
+        <div class="field-row">
+          <input type="number" id="mov-amount" placeholder="importo €" min="0" step="0.01">
+          <input type="text" id="mov-desc" placeholder="nota" style="flex:1.5">
+        </div>
+        <button class="primary" onclick="addMovimento()">aggiungi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAMMA -->
+  <div class="panel" id="panel-mamma">
+    <div class="card">
+      <div class="grid2">
+        <div class="metric">
+          <div class="metric-label">accumulato</div>
+          <div class="metric-val green" id="fondo-tot">€0,00</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">mesi versati</div>
+          <div class="metric-val" id="fondo-mesi">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">quota mensile</div>
+      <div class="info-row">quota attuale <strong id="quota-display">€200,00</strong></div>
+      <div class="field-row" style="margin-top:10px">
+        <input type="number" id="quota-input" placeholder="nuova quota" min="0">
+        <button class="primary" onclick="setQuota()">salva</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">registra versamento</div>
+      <div class="field-group">
+        <input type="number" id="vers-extra" placeholder="importo (vuoto = quota mensile)">
+        <input type="text" id="vers-nota" placeholder="nota opzionale">
+        <button class="primary" onclick="addVersamento()">registra</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORICO -->
+  <div class="panel" id="panel-storico">
+    <div class="card">
+      <div class="card-label">tutti i movimenti</div>
+      <div class="log-list" id="log-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let S = JSON.parse(localStorage.getItem('rimborso_v2') || 'null') || {
+  debitoIniziale: 0,
+  debitoResiduo: 0,
+  quota: 200,
+  fondoTot: 0,
+  log: []
+};
+
+function save() { localStorage.setItem('rimborso_v2', JSON.stringify(S)); }
+
+function fmt(n) {
+  return '€' + Math.abs(n).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+function today() {
+  return new Date().toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: '2-digit' });
+}
+
+function render() {
+  const res = Math.max(0, S.debitoResiduo);
+  document.getElementById('debito-display').textContent = fmt(res);
+  const pct = S.debitoIniziale > 0 ? Math.max(0, Math.min(100, (1 - S.debitoResiduo / S.debitoIniziale) * 100)) : 0;
+  document.getElementById('debito-progress').style.width = pct.toFixed(1) + '%';
+  const pagato = Math.max(0, S.debitoIniziale - S.debitoResiduo);
+  document.getElementById('debito-note').textContent = S.debitoIniziale > 0
+    ? fmt(pagato) + ' restituiti su ' + fmt(S.debitoIniziale) + ' (' + pct.toFixed(0) + '%)'
+    : '';
+
+  document.getElementById('quota-display').textContent = fmt(S.quota);
+  document.getElementById('fondo-tot').textContent = fmt(S.fondoTot);
+  const mesi = S.log.filter(l => l.tipo === 'mamma').length;
+  document.getElementById('fondo-mesi').textContent = mesi;
+
+  renderLog();
+}
+
+function renderLog() {
+  const el = document.getElementById('log-list');
+  if (!S.log.length) { el.innerHTML = '<div class="empty">nessun movimento registrato</div>'; return; }
+
+  const tagMap = {
+    risparmio: ['tag-risparmio', 'risparmio'],
+    spesa: ['tag-spesa', 'spesa per lei'],
+    restituito: ['tag-restituito', 'restituito'],
+    mamma: ['tag-mamma', 'fondo mamma'],
+    init: ['tag-init', 'debito iniziale']
+  };
+
+  el.innerHTML = [...S.log].reverse().map((l, i) => {
+    const ri = S.log.length - 1 - i;
+    const [tagClass, tagLabel] = tagMap[l.tipo] || ['tag-init', l.tipo];
+    const amtClass = l.delta > 0 ? 'pos' : l.delta < 0 ? 'neg' : 'neu';
+    const amtText = l.delta === 0 ? '' : (l.delta > 0 ? '+' : '') + fmt(l.delta);
+    return `<div class="log-item">
+      <span class="log-date">${l.data}</span>
+      <span class="log-desc">${l.desc}<br><span class="log-tag ${tagClass}">${tagLabel}</span></span>
+      <span class="log-amount ${amtClass}">${amtText}</span>
+      <button class="del-btn" onclick="delLog(${ri})" title="elimina">×</button>
+    </div>`;
+  }).join('');
+}
+
+function setDebito() {
+  const v = parseFloat(document.getElementById('debito-init').value);
+  if (isNaN(v) || v < 0) { alert('importo non valido'); return; }
+  S.debitoIniziale = v;
+  S.debitoResiduo = v;
+  S.log.push({ data: today(), tipo: 'init', desc: 'debito iniziale impostato: ' + fmt(v), delta: 0 });
+  save(); render();
+  document.getElementById('debito-init').value = '';
+}
+
+function addMovimento() {
+  const tipo = document.getElementById('tipo-mov').value;
+  const amt = parseFloat(document.getElementById('mov-amount').value);
+  const nota = document.getElementById('mov-desc').value.trim();
+  if (isNaN(amt) || amt <= 0) { alert('importo non valido'); return; }
+
+  let desc = nota || (tipo === 'risparmio' ? 'messo da parte' : tipo === 'spesa' ? 'spesa per sorella' : 'restituito');
+  let delta = 0;
+
+  if (tipo === 'spesa' || tipo === 'restituito') {
+    S.debitoResiduo = Math.max(0, S.debitoResiduo - amt);
+    delta = -amt;
+  } else {
+    delta = amt;
+  }
+
+  S.log.push({ data: today(), tipo, desc, delta });
+  save(); render();
+  document.getElementById('mov-amount').value = '';
+  document.getElementById('mov-desc').value = '';
+}
+
+function setQuota() {
+  const v = parseFloat(document.getElementById('quota-input').value);
+  if (isNaN(v) || v < 0) { alert('importo non valido'); return; }
+  S.quota = v;
+  save(); render();
+  document.getElementById('quota-input').value = '';
+}
+
+function addVersamento() {
+  const extra = document.getElementById('vers-extra').value;
+  const nota = document.getElementById('vers-nota').value.trim();
+  const amt = extra ? parseFloat(extra) : S.quota;
+  if (isNaN(amt) || amt <= 0) { alert('importo non valido'); return; }
+  S.fondoTot += amt;
+  const desc = nota || 'versamento mensile fondo mamma';
+  S.log.push({ data: today(), tipo: 'mamma', desc, delta: amt });
+  save(); render();
+  document.getElementById('vers-extra').value = '';
+  document.getElementById('vers-nota').value = '';
+}
+
+function delLog(idx) {
+  if (!confirm('Eliminare questo movimento?')) return;
+  const l = S.log[idx];
+  if (l.tipo === 'spesa' || l.tipo === 'restituito') S.debitoResiduo = Math.min(S.debitoIniziale, S.debitoResiduo + Math.abs(l.delta));
+  if (l.tipo === 'mamma') S.fondoTot = Math.max(0, S.fondoTot - Math.abs(l.delta));
+  if (l.tipo === 'risparmio') {}
+  S.log.splice(idx, 1);
+  save(); render();
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['debito', 'mamma', 'storico'][i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.toggle('active', p.id === 'panel-' + name);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
